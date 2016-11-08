@@ -11,8 +11,7 @@ using namespace std;
 считывание из файла побитово(?)
 */
 
-void makeKeys(wchar_t keys[][6], int *bigKey);
-
+void readBlocks();
 void main(int argc, char* argv[]) {
 	FILE *f;
 	fopen_s(&f, "text.txt", "rb");
@@ -34,49 +33,33 @@ void main(int argc, char* argv[]) {
 	//------------------------------
 	cout << endl;
 	srand(time(NULL));
-	int mas[SIZE];
-	wchar_t a = 0;
-	for (int i = 0; i < SIZE; i++) {//переводит число в десятичное
+	int mas[SIZE];//наш ключ
+	for (int i = 0; i < SIZE; i++) {
 		mas[i] = rand() % 2;
-		cout << mas[i];
-		if (i % 4 == 3) cout << " ";
-
-		a = a << 1;
-		a = a + mas[i];
-		if (i % 16 == 15) {//считали 16 бит
-			cout << "a = " << a << endl;
-			a = 0;
-		}
+		//cout << mas[i];
+		//if (i % 4 == 3) cout << " ";
+		//переводит число в десятичное
+		//a = a << 1;
+		//a = a + mas[i];
+		//if (i % 16 == 15) {//считали 16 бит
+		//	cout << "a = " << a << endl;
+		//	a = 0;
+		//}
 	}
 	cout << endl;
 	//обработка сдвига влево: новый индекс + сдвиг*номер сдвига % размера = старый индекс
 	//-------------------
 
-	wchar_t key[9][6];	
-	makeKeys(key, mas);
+
 	//проверка
-	for (int i = 0; i < 9; i++) {
+	/*for (int i = 0; i < 9; i++) {
 		for (int j = 0; j < 6; j++) {
 			cout << key[i][j] << "\t";
 		}
 		cout << endl;
-	}
+	}*/
+
+
 
 	system("PAUSE");
-}
-//составляет подключи из ключа
-void makeKeys(wchar_t keys[][6], int *bigKey) {
-	for (int i = 0; i < 9; i++)
-		for (int j = 0; j < 6; j++)
-			keys[i][j] = 0;
-	int k = 0;//номер подключа
-	for (int j = 0; j < 7; j++) {//кол-во сдвигов
-		for (int i = 0; i < SIZE; i++) {//проход по 128-битному ключу
-			keys[k / 6][k % 6] = keys[k / 6][k % 6] << 1;
-			keys[k / 6][k % 6] = keys[k / 6][k % 6] + bigKey[(i + 25 * j) % SIZE];
-			if (i % 16 == 15) k++;
-			if (k == 52) break;
-		}
-		if (k == 52) break;
-	}
 }

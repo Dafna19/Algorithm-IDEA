@@ -7,6 +7,12 @@
 функцию раунда
 */
 class IDEA {
+private:
+	wchar_t key[9][6];
+	//составляет подключи из ключа
+	void makeKeys(wchar_t keys[][6], int *bigKey);
 public:
+	void coding(char *source, char *out, int *bigKey);
+	void decoding(char *source, char *out, int *bigKey);
 
 };

@@ -1,6 +1,6 @@
 .gitignore
 .gitattributes
-.sln
+*.sln
 *.vcxproj
 *.vcxproj.filters
 
