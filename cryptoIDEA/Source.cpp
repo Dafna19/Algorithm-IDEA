@@ -1,5 +1,6 @@
 #include<iostream>
 #include <time.h>
+#include "IDEA.h"
 using namespace std;
 #pragma warning(2:4235)
 #define SIZE 128
@@ -9,29 +10,11 @@ using namespace std;
 функцию 4х операций(для 9го раунда)
 функцию раунда
 считывание из файла побитово(?)
+обработка сдвига влево: новый индекс + сдвиг*номер сдвига % размера = старый индекс
 */
 
-void readBlocks();
 void main(int argc, char* argv[]) {
-	FILE *f;
-	fopen_s(&f, "text.txt", "rb");
-	//------------считывание по 16 бит
-	wchar_t ch = 0, bufc = 0;
-	int sum = 0;
-	while (!feof(f)) {
-		fread(&bufc, sizeof(unsigned char), 1, f);//1 байт	
-		sum++;
-		if (sum == 2) //считался 2й байт числа
-			bufc = bufc << 8;
-		ch += bufc;
-		if (sum == 2) {
-			cout << ch << " ";
-			sum = 0;
-			ch = bufc = 0;
-		}
-	}
-	//------------------------------
-	cout << endl;
+	IDEA idea;
 	srand(time(NULL));
 	int mas[SIZE];//наш ключ
 	for (int i = 0; i < SIZE; i++) {
@@ -46,18 +29,9 @@ void main(int argc, char* argv[]) {
 		//	a = 0;
 		//}
 	}
+	idea.coding("text.txt", "out.bin", mas);
 	cout << endl;
-	//обработка сдвига влево: новый индекс + сдвиг*номер сдвига % размера = старый индекс
-	//-------------------
 
-
-	//проверка
-	/*for (int i = 0; i < 9; i++) {
-		for (int j = 0; j < 6; j++) {
-			cout << key[i][j] << "\t";
-		}
-		cout << endl;
-	}*/
 
 
 
