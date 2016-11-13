@@ -8,7 +8,7 @@
 */
 class IDEA {
 private:
-	float corr;
+	float corr, zeros, ones;
 	int allBits;
 
 	void countCorrelation(wchar_t buf, int block);

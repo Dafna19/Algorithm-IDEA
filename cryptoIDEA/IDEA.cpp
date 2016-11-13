@@ -3,11 +3,13 @@
 #define SIZE 128
 
 void IDEA::countCorrelation(wchar_t buf, int block) {
-		//std::cout << buf << " " << block << std::endl;
 	for (int i = 0; i < 16; i++) {
-		//std::cout << buf % 2 << " -> " << block % 2 << "  (" << (2 * (buf % 2) - 1) << ") * (" << (2 * (block % 2) - 1) << ") => ";
 		corr += (2 * (buf % 2) - 1)*(2 * (block % 2) - 1);
-		//std::cout << corr << std::endl;
+
+		//считаем кол-во 0 и 1 в выходном потоке
+		if ((block % 2) == 1) ones++;
+		else zeros++;
+
 		buf = buf >> 1;
 		block = block >> 1;
 	}
@@ -112,6 +114,8 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 	unsigned int blockA, blockB, blockC, blockD;
 	corr = 0;
 	allBits = 0;
+	zeros = 0;
+	ones = 0;
 
 	makeKeys(key, bigKey);
 	if (decode) inverseKey();
@@ -206,8 +210,12 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 		fwrite(&blockD, sizeof(wchar_t), 1, output);
 	}
 
-	corr = corr / allBits;
-	std::cout << "\ncorrelation = " << corr << std::endl;
+	if (!decode) {
+		corr = corr / allBits;
+		std::cout << "\ncorrelation = " << corr << std::endl;
+		std::cout << "probability(0) = " << zeros / allBits << std::endl;
+		std::cout << "probability(1) = " << ones / allBits << std::endl;
+	}
 
 	fclose(input);
 	fclose(output);
