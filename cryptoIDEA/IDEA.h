@@ -1,31 +1,30 @@
-#pragma once
+п»ї#pragma once
 #include <stdio.h>
 
 /*
-сделать 128 бит ключ(256 бит для сдвига)
-функцию 4х операций(для 9го раунда)
-функцию раунда
+СЃРґРµР»Р°С‚СЊ 128 Р±РёС‚ РєР»СЋС‡(256 Р±РёС‚ РґР»СЏ СЃРґРІРёРіР°)
+С„СѓРЅРєС†РёСЋ 4С… РѕРїРµСЂР°С†РёР№(РґР»СЏ 9РіРѕ СЂР°СѓРЅРґР°)
+С„СѓРЅРєС†РёСЋ СЂР°СѓРЅРґР°
 */
 class IDEA {
 private:
-	float corr, zeros, ones;
-	int allBits;
-
-	void countCorrelation(wchar_t buf, int block);
-
+	float corr;
+	int zeros, ones, allBits;
 	wchar_t key[9][6];
 
-	//составляет подключи из ключа
+	void countCorrelation(wchar_t buf, int block);	
+
+	//СЃРѕСЃС‚Р°РІР»СЏРµС‚ РїРѕРґРєР»СЋС‡Рё РёР· РєР»СЋС‡Р°
 	void makeKeys(wchar_t keys[][6], int *bigKey);
 
-	//читает блок из 16 бит
+	//С‡РёС‚Р°РµС‚ Р±Р»РѕРє РёР· 16 Р±РёС‚
 	wchar_t readBlock(FILE *input);
 
-	//для дешифровки
+	//РґР»СЏ РґРµС€РёС„СЂРѕРІРєРё
 	void inverseKey();
 
-	//обратный элемент
-	wchar_t evclid(int a, wchar_t mod);
+	//РѕР±СЂР°С‚РЅС‹Р№ СЌР»РµРјРµРЅС‚
+	wchar_t evclid(int a, wchar_t b);
 
 	void code(char *source, char *out, int *bigKey, bool decode);
 

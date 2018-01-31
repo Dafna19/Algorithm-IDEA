@@ -1,4 +1,4 @@
-#include "IDEA.h"
+ï»¿#include "IDEA.h"
 #include<iostream>
 #define SIZE 128
 
@@ -6,9 +6,9 @@ void IDEA::countCorrelation(wchar_t buf, int block) {
 	for (int i = 0; i < 16; i++) {
 		corr += (2 * (buf % 2) - 1)*(2 * (block % 2) - 1);
 
-		//ñ÷èòàåì êîë-âî 0 è 1 â âûõîäíîì ïîòîêå
+		//ÑÑ‡Ð¸Ñ‚Ð°ÐµÐ¼ ÐºÐ¾Ð»-Ð²Ð¾ 0 Ð¸ 1 Ð² Ð²Ñ‹Ñ…Ð¾Ð´Ð½Ð¾Ð¼ Ð¿Ð¾Ñ‚Ð¾ÐºÐµ
 		if ((block % 2) == 1) ones++;
-		else zeros++;
+		else if ((block % 2) == 0) zeros++;
 
 		buf = buf >> 1;
 		block = block >> 1;
@@ -19,9 +19,9 @@ void IDEA::makeKeys(wchar_t keys[][6], int * bigKey) {
 	for (int i = 0; i < 9; i++)
 		for (int j = 0; j < 6; j++)
 			keys[i][j] = 0;
-	int k = 0;//íîìåð ïîäêëþ÷à
-	for (int j = 0; j < 7; j++) {//êîë-âî ñäâèãîâ
-		for (int i = 0; i < SIZE; i++) {//ïðîõîä ïî 128-áèòíîìó êëþ÷ó
+	int k = 0;//Ð½Ð¾Ð¼ÐµÑ€ Ð¿Ð¾Ð´ÐºÐ»ÑŽÑ‡Ð°
+	for (int j = 0; j < 7; j++) {//ÐºÐ¾Ð»-Ð²Ð¾ ÑÐ´Ð²Ð¸Ð³Ð¾Ð²
+		for (int i = 0; i < SIZE; i++) {//Ð¿Ñ€Ð¾Ñ…Ð¾Ð´ Ð¿Ð¾ 128-Ð±Ð¸Ñ‚Ð½Ð¾Ð¼Ñƒ ÐºÐ»ÑŽÑ‡Ñƒ
 			keys[k / 6][k % 6] = keys[k / 6][k % 6] << 1;
 			keys[k / 6][k % 6] = keys[k / 6][k % 6] + bigKey[(i + 25 * j) % SIZE];
 			if (i % 16 == 15) k++;
@@ -34,10 +34,10 @@ void IDEA::makeKeys(wchar_t keys[][6], int * bigKey) {
 wchar_t IDEA::readBlock(FILE * input) {
 	wchar_t buffer = 0, block = 0;
 	for (int i = 0; i < 2; i++) {
-		fread(&buffer, sizeof(unsigned char), 1, input);//1 áàéò
-		if (feof(input) && i == 0) return NULL;//äîñòèãíóò êîíåö â ñàìîì íà÷àëå
-		if (feof(input) && i == 1) return block;//äîñòèãíóò êîíåö ïðè ñ÷èòûâàíèè âòîðîãî áàéòà
-		if (i == 1) //ñ÷èòàëñÿ 2é áàéò ÷èñëà
+		fread(&buffer, sizeof(unsigned char), 1, input);//1 Ð±Ð°Ð¹Ñ‚
+		if (feof(input) && i == 0) return NULL;//Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÑ‚ ÐºÐ¾Ð½ÐµÑ† Ð² ÑÐ°Ð¼Ð¾Ð¼ Ð½Ð°Ñ‡Ð°Ð»Ðµ
+		if (feof(input) && i == 1) return block;//Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÑ‚ ÐºÐ¾Ð½ÐµÑ† Ð¿Ñ€Ð¸ ÑÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ð½Ð¸Ð¸ Ð²Ñ‚Ð¾Ñ€Ð¾Ð³Ð¾ Ð±Ð°Ð¹Ñ‚Ð°
+		if (i == 1) //ÑÑ‡Ð¸Ñ‚Ð°Ð»ÑÑ 2Ð¹ Ð±Ð°Ð¹Ñ‚ Ñ‡Ð¸ÑÐ»Ð°
 			buffer = buffer << 8;
 		block += buffer;
 	}
@@ -49,34 +49,21 @@ void IDEA::inverseKey() {
 	wchar_t buffer[9][6];
 	for (int i = 0; i < 9; i++) {
 		buffer[i][0] = evclid(65537, key[8 - i][0]);
-		unsigned int test = buffer[i][0] * key[8 - i][0];
-		if (test % 65537 != 1) std::cout << "incorrect evclid(1) " << key[8 - i][0] << " -> " << buffer[i][0] << " test = " << test << " res = " << (buffer[i][0] * key[8 - i][0]) % 65537 << "\n";
 		if (i == 0 || i == 8) {
-			buffer[i][1] = (0 - key[8 - i][1]) + 65536;///
-			if ((key[8 - i][1] + buffer[i][1]) % 65536 != 0) std::cout << "incorrect inverse\n";
-
-			buffer[i][2] = (0 - key[8 - i][2]) + 65536;///
-			if ((key[8 - i][2] + buffer[i][2]) % 65536 != 0) std::cout << "incorrect inverse\n";
+			buffer[i][1] = (0 - key[8 - i][1]) + 65536;
+			buffer[i][2] = (0 - key[8 - i][2]) + 65536;
 		}
 		else {
-			buffer[i][1] = (0 - key[8 - i][2]) + 65536;///
-			if ((key[8 - i][2] + buffer[i][1]) % 65536 != 0) std::cout << "incorrect inverse\n";
-
-			buffer[i][2] = (0 - key[8 - i][1]) + 65536;///
-			if ((key[8 - i][1] + buffer[i][2]) % 65536 != 0) std::cout << "incorrect inverse\n";
+			buffer[i][1] = (0 - key[8 - i][2]) + 65536;
+			buffer[i][2] = (0 - key[8 - i][1]) + 65536;
 		}
-
 		buffer[i][3] = evclid(65537, key[8 - i][3]);
-		test = buffer[i][3] * key[8 - i][3];
-		if (test % 65537 != 1) std::cout << "incorrect evclid " << key[8 - i][3] << " -> " << buffer[i][3] << " test = " << test << " res = " << (buffer[i][3] * key[8 - i][3]) % 65537 << "\n";
-
 		buffer[i][4] = key[7 - i][4];
 		buffer[i][5] = key[7 - i][5];
 	}
 	for (int i = 0; i < 9; i++)
 		for (int j = 0; j < 6; j++)
 			key[i][j] = buffer[i][j];
-
 }
 
 wchar_t IDEA::evclid(int a, wchar_t b) {
@@ -137,7 +124,7 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 		if (feof(input)) break;
 
 		blockB = readBlock(input);
-		if (feof(input)) {//äî êðàòíîñòè
+		if (feof(input)) {//Ð´Ð¾ ÐºÑ€Ð°Ñ‚Ð½Ð¾ÑÑ‚Ð¸
 			blockB = blockC = blockD = 65536;
 		}
 
@@ -151,7 +138,7 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 			blockD = 65536;
 		}
 
-		//äëÿ êîððåëÿöèè
+		//Ð´Ð»Ñ ÐºÐ¾Ñ€Ñ€ÐµÐ»ÑÑ†Ð¸Ð¸
 		wchar_t bufA = blockA, bufB = blockB, bufC = blockC, bufD = blockD;
 		allBits += 64;
 
@@ -182,13 +169,13 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 				blockC = buf;
 			}
 		}
-		//9é ðàóíä - îêîí÷àòåëüíîå ïðåîáðàçîâàíèå
+		//9Ð¹ Ñ€Ð°ÑƒÐ½Ð´ - Ð¾ÐºÐ¾Ð½Ñ‡Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ð¿Ñ€ÐµÐ¾Ð±Ñ€Ð°Ð·Ð¾Ð²Ð°Ð½Ð¸Ðµ
 		blockA = (blockA * key[8][0]) % 65537;
 		blockB = (blockB + key[8][1]) % 65536;
 		blockC = (blockC + key[8][2]) % 65536;
 		blockD = (blockD * key[8][3]) % 65537;
 
-		//âîò çäåñü êîððåëÿöèÿ
+		//Ð²Ð¾Ñ‚ Ð·Ð´ÐµÑÑŒ ÐºÐ¾Ñ€Ñ€ÐµÐ»ÑÑ†Ð¸Ñ
 		countCorrelation(bufA, blockA);
 		countCorrelation(bufB, blockB);
 		countCorrelation(bufC, blockC);
@@ -196,7 +183,7 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 
 
 		fwrite(&blockA, sizeof(wchar_t), 1, output);
-		if (decode && blockB == 65536) //ò.å. ýòî äîáàâëåíî ïðî êîäèðîâàíèè
+		if (decode && blockB == 65536) //Ñ‚.Ðµ. ÑÑ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¾ Ð¿Ñ€Ð¾ ÐºÐ¾Ð´Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ð¸
 			break;
 
 		fwrite(&blockB, sizeof(wchar_t), 1, output);
@@ -213,8 +200,8 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 	if (!decode) {
 		corr = corr / allBits;
 		std::cout << "\ncorrelation = " << corr << std::endl;
-		std::cout << "probability(0) = " << zeros / allBits << std::endl;
-		std::cout << "probability(1) = " << ones / allBits << std::endl;
+		std::cout << "probability(0) = " << ((float)zeros) / allBits << std::endl;
+		std::cout << "probability(1) = " << ((float)ones) / allBits << std::endl;
 	}
 
 	fclose(input);
@@ -223,10 +210,10 @@ void IDEA::code(char * source, char * out, int * bigKey, bool decode) {
 
 void IDEA::coding(char * source, char * out, int * bigKey) {
 	code(source, out, bigKey, false);
-	std::cout << "\ncoded\n";
+	std::cout << "\ncoded to " << out << "\n";
 }
 
 void IDEA::decoding(char * source, char * out, int * bigKey) {
 	code(source, out, bigKey, true);
-	std::cout << "\ndecoded\n";
+	std::cout << "\ndecoded to " << out << "\n";
 }
